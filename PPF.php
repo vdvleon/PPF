@@ -2,8 +2,6 @@
 
 define('DS', DIRECTORY_SEPARATOR);
 
-namespace PPF;
-
 /**
  * PHP Project Framework
  *
@@ -15,7 +13,7 @@ class PPF
 	/**
 	 * Instance.
 	 *
-	 * @var \PPF\PPF
+	 * @var PPF
 	 */
 	static protected $instance_ = null;
 
@@ -40,22 +38,13 @@ class PPF
 	 */
 	protected function __construct(array $settings)
 	{
-		foreach ($settings as $name => $arguments)
+		foreach ($settings as $method => $arguments)
 		{
 			$arguments = (array) $arguments;
-			$method = $name;
-
-			if ( ! is_callable([$this, $method]) && count($arguments) == 1 && is_array($arguments[0]))
-			{
-				$method = self::camelize('set ' . $name);
-			}
+			
 			if ( ! is_callable([$this, $method]))
 			{
-				$method = self::camelize('add ' . $name);
-			}
-			if ( ! is_callable([$this, $method]))
-			{
-				throw new \Exception('Wrong setting \'' . $method . '\'');
+				throw new Exception('Wrong setting \'' . $method . '\'');
 			}
 
 			call_user_func_array([$this, $method], $arguments);
@@ -88,7 +77,7 @@ class PPF
 	/**
 	 * Instance.
 	 *
-	 * @return \PPF\PFF
+	 * @return PPF
 	 */
 	public static function instance()
 	{
@@ -112,7 +101,7 @@ class PPF
 	 *
 	 * @param array|string $module
 	 * @param bool $overwrite Overwrite modules instead of adding.
-	 * @return array|\PPF\PPF List of modules in get mode, this pointer otherwise.
+	 * @return array|PPF List of modules in get mode, this pointer otherwise.
 	 */
 	public function modules($module = null, $overwrite = false)
 	{
@@ -154,7 +143,7 @@ class PPF
 	 * Enable autoloader.
 	 *
 	 * @param bool $enable
-	 * @return \PPF\PPF This.
+	 * @return PPF This.
 	 */
 	public function enableAutoloader($enable = true)
 	{
@@ -173,11 +162,12 @@ class PPF
 	 * Namespace support.
 	 *
 	 * @param bool $enable
-	 * @return \PPF\PPF This.
+	 * @return PPF This.
 	 */
 	public function namespaces($enable = true)
 	{
 		$this->namespaces_ = (bool) $enable;
+		return $this;
 	}
 
 	/**
@@ -192,7 +182,7 @@ class PPF
 	public function findPath($file, $directory = null, $extension = null, $all = false)
 	{
 		$file = trim($file, DS);
-		if ($directory !== null)
+		if ( ! empty($directory))
 		{
 			$file = trim($directory, DS) . DS . $file;
 		}
